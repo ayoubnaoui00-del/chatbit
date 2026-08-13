@@ -1,0 +1,45 @@
+flowchart TD
+    %% Actors
+    Client(["👤 Client (Customer)"])
+    Agent(["🎧 Agent (Support Team)"])
+
+    %% Use Cases
+    UC_Register(["Register"])
+    UC_Login(["Login"])
+    UC_Auth(["<<include>> Authenticate (JWT)"])
+    UC_CreateConv(["Create Conversation (Client)"])
+    UC_ViewAvail(["View Available Conversations (Agent)"])
+    UC_JoinConv(["Join Conversation (Agent)"])
+    UC_SendMsg(["Send Message"])
+    UC_RecvMsg(["Receive Message (Real-time)"])
+    UC_ViewHistory(["View Chat History"])
+    UC_CloseConv(["Close Conversation (Agent)"])
+    UC_RecvClose(["Receive Closure Notification"])
+
+    %% Client Associations
+    Client --> UC_Register
+    Client --> UC_Login
+    Client --> UC_CreateConv
+    Client --> UC_SendMsg
+    Client --> UC_RecvMsg
+    Client --> UC_ViewHistory
+    Client --> UC_RecvClose
+
+    %% Agent Associations
+    Agent --> UC_Login
+    Agent --> UC_ViewAvail
+    Agent --> UC_JoinConv
+    Agent --> UC_SendMsg
+    Agent --> UC_RecvMsg
+    Agent --> UC_ViewHistory
+    Agent --> UC_CloseConv
+
+    %% Include Relationships
+    UC_CreateConv -.-> UC_Auth
+    UC_ViewAvail -.-> UC_Auth
+    UC_JoinConv -.-> UC_Auth
+    UC_SendMsg -.-> UC_Auth
+    UC_RecvMsg -.-> UC_Auth
+    UC_ViewHistory -.-> UC_Auth
+    UC_CloseConv -.-> UC_Auth
+    UC_RecvClose -.-> UC_Auth

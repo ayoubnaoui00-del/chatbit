@@ -1,0 +1,44 @@
+classDiagram
+    class Users {
+        +int id
+        +string fullname
+        +string email
+        +string passwordhash
+        +string role
+        +boolean isonline
+        +datetime createdat
+        +register(fullname, email, password, role)
+        +login(email, password)
+        +getProfile(userId)
+        +updateOnlineStatus(userId, isOnline)
+    }
+
+    class Conversations {
+        +int id
+        +string subject
+        +string status
+        +int clientid
+        +int agentid
+        +datetime createdat
+        +datetime closedat
+        +createConversation(clientId, subject)
+        +joinConversation(conversationId, agentId)
+        +closeConversation(conversationId, agentId)
+        +getMessages(conversationId, page, limit)
+    }
+
+    class Messages {
+        +int id
+        +int conversationid
+        +int senderid
+        +string content
+        +boolean isread
+        +datetime sentat
+        +sendMessage(conversationId, senderId, content)
+        +markAsRead(messageId)
+    }
+
+    Users "1" --> "0..*" Conversations : creates (as Client)
+    Users "0..1" --> "0..*" Conversations : assigned to (as Agent)
+    Conversations "1" *-- "0..*" Messages : contains
+    Users "1" --> "0..*" Messages : sends

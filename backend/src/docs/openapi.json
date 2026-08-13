@@ -1,0 +1,364 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ChatBit API - Souq Express",
+    "description": "Backend REST API and real-time support documentation for ChatBit at Souq Express.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your JWT token obtained from /api/auth/login or /api/auth/register."
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "fullname": {
+            "type": "string",
+            "example": "Yassine El Amrani"
+          },
+          "email": {
+            "type": "string",
+            "example": "yassine@souqexpress.ma"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["client", "agent"],
+            "example": "client"
+          },
+          "isonline": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-08-12T14:00:00Z"
+          }
+        }
+      },
+      "Conversation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 101
+          },
+          "subject": {
+            "type": "string",
+            "example": "Order #4829 Delivery Delay"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "closed"],
+            "example": "pending"
+          },
+          "clientid": {
+            "type": "integer",
+            "example": 1
+          },
+          "agentid": {
+            "type": "integer",
+            "nullable": true,
+            "example": 2
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 501
+          },
+          "conversationid": {
+            "type": "integer",
+            "example": 101
+          },
+          "senderid": {
+            "type": "integer",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "example": "Hello, my package was supposed to arrive yesterday in Casablanca."
+          },
+          "isread": {
+            "type": "boolean",
+            "example": false
+          },
+          "sentat": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user (Client or Agent)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullname", "email", "password"],
+                "properties": {
+                  "fullname": {
+                    "type": "string",
+                    "example": "Khadija Benali"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "khadija@souqexpress.ma"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Password123!"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["client", "agent"],
+                    "default": "client"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully with JWT token"
+          },
+          "400": {
+            "description": "Missing or invalid fields"
+          },
+          "409": {
+            "description": "Email already exists"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login to receive JWT token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "khadija@souqexpress.ma"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Password123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get authenticated user profile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user details"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/conversations": {
+      "get": {
+        "tags": ["Conversations"],
+        "summary": "List conversations for current user or agent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of conversations"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Conversations"],
+        "summary": "Create a new conversation (Client only)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["subject"],
+                "properties": {
+                  "subject": {
+                    "type": "string",
+                    "example": "Question regarding return policy in Marrakech"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conversation created with status 'pending'"
+          },
+          "403": {
+            "description": "Only clients can create conversations"
+          }
+        }
+      }
+    },
+    "/api/conversations/{id}/messages": {
+      "get": {
+        "tags": ["Messages"],
+        "summary": "Get paginated message history for a conversation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Conversation ID"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Number of messages per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated messages list"
+          },
+          "403": {
+            "description": "Unauthorized to view this conversation"
+          },
+          "404": {
+            "description": "Conversation not found"
+          }
+        }
+      }
+    },
+    "/api/conversations/{id}/close": {
+      "patch": {
+        "tags": ["Conversations"],
+        "summary": "Close a conversation (Agent only)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Conversation ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversation closed successfully"
+          },
+          "403": {
+            "description": "Only agents can close conversations"
+          },
+          "404": {
+            "description": "Conversation not found"
+          }
+        }
+      }
+    }
+  }
+}
