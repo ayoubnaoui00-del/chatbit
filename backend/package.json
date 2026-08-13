@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node --watch src/server.js",
+    "seed": "node src/seed.js",
     "podman:up": "podman compose up -d",
     "podman:down": "podman compose down",
     "podman:logs": "podman compose logs -f"

@@ -69,7 +69,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           <View style={styles.inputWrapper}>
             <TextInput
               style={styles.input}
-              placeholder={disabled ? 'Conversation fermée' : 'Écrivez votre message...'}
+              placeholder={disabled ? 'Conversation is closed' : 'Type your message...'}
               placeholderTextColor={COLORS.outline}
               value={text}
               onChangeText={handleChangeText}

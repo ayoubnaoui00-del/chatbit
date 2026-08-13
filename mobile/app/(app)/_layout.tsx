@@ -39,7 +39,7 @@ export default function AppLayout() {
       <Stack.Screen
         name="conversations"
         options={{
-          title: 'Conversations Support',
+          title: 'Support Conversations',
           headerBackVisible: false,
         }}
       />
@@ -52,7 +52,7 @@ export default function AppLayout() {
       <Stack.Screen
         name="profile"
         options={{
-          title: 'Mon Profil',
+          title: 'My Profile',
         }}
       />
     </Stack>

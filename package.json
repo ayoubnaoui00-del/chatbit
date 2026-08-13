@@ -4,9 +4,12 @@
   "description": "ChatBit Support Application for Souq Express",
   "scripts": {
     "dev": "npm --prefix backend run dev",
+    "seed": "npm --prefix backend run seed",
     "start": "npm --prefix backend start",
     "podman:up": "podman compose -f backend/docker-compose.yml up -d",
     "podman:down": "podman compose -f backend/docker-compose.yml down",
-    "podman:logs": "podman compose -f backend/docker-compose.yml logs -f"
+    "podman:logs": "podman compose -f backend/docker-compose.yml logs -f",
+    "mobile": "npm --prefix mobile start",
+    "mobile:web": "npm --prefix mobile run web"
   }
 }

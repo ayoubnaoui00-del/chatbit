@@ -31,7 +31,7 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!fullname || !email || !password) {
-      setErrorMsg('Veuillez remplir tous les champs');
+      setErrorMsg('Please fill in all fields');
       return;
     }
 
@@ -42,9 +42,9 @@ export default function RegisterScreen() {
       router.replace('/(app)/conversations');
     } catch (err: any) {
       console.error('Register error:', err);
-      const msg = err.response?.data?.message || 'Erreur lors de l\'inscription';
+      const msg = err.response?.data?.message || 'Failed to create account';
       setErrorMsg(msg);
-      Alert.alert('Inscription échouée', msg);
+      Alert.alert('Registration Failed', msg);
     } finally {
       setLoading(false);
     }
@@ -59,8 +59,8 @@ export default function RegisterScreen() {
             <View style={styles.logoBadge}>
               <Image source={logoImg} style={styles.logoImage} resizeMode="contain" />
             </View>
-            <Text style={styles.brandTitle}>Créer un compte</Text>
-            <Text style={styles.brandSubtitle}>Rejoignez le chat support Souq Express</Text>
+            <Text style={styles.brandTitle}>Create Account</Text>
+            <Text style={styles.brandSubtitle}>Join Souq Express Support Chat</Text>
           </View>
 
           {/* Role Toggle Switcher */}
@@ -71,7 +71,7 @@ export default function RegisterScreen() {
               activeOpacity={0.8}
             >
               <Text style={[styles.roleOptionText, role === 'client' && styles.roleOptionTextActive]}>
-                Client
+                Customer
               </Text>
             </TouchableOpacity>
 
@@ -81,7 +81,7 @@ export default function RegisterScreen() {
               activeOpacity={0.8}
             >
               <Text style={[styles.roleOptionText, role === 'agent' && styles.roleOptionTextActive]}>
-                Agent Support
+                Support Agent
               </Text>
             </TouchableOpacity>
           </View>
@@ -95,15 +95,15 @@ export default function RegisterScreen() {
             )}
 
             <Input
-              label="Nom Complet"
-              placeholder="Ex: Karim Benali"
+              label="Full Name"
+              placeholder="e.g. John Doe"
               value={fullname}
               onChangeText={setFullname}
             />
 
             <Input
-              label="Adresse Email"
-              placeholder="votre@email.com"
+              label="Email Address"
+              placeholder="user@example.com"
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
@@ -111,7 +111,7 @@ export default function RegisterScreen() {
             />
 
             <Input
-              label="Mot de Passe"
+              label="Password"
               placeholder="••••••••"
               isPassword
               value={password}
@@ -119,7 +119,7 @@ export default function RegisterScreen() {
             />
 
             <Button
-              title={loading ? 'Création...' : "S'inscrire"}
+              title={loading ? 'Creating Account...' : 'Sign Up'}
               onPress={handleRegister}
               loading={loading}
               style={styles.submitBtn}
@@ -130,8 +130,8 @@ export default function RegisterScreen() {
               onPress={() => router.push('/(auth)/login')}
             >
               <Text style={styles.loginText}>
-                Déjà un compte ?{' '}
-                <Text style={styles.loginTextHighlight}>Se connecter</Text>
+                Already have an account?{' '}
+                <Text style={styles.loginTextHighlight}>Sign In</Text>
               </Text>
             </TouchableOpacity>
           </View>

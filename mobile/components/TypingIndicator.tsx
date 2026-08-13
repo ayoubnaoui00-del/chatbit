@@ -7,7 +7,7 @@ interface TypingIndicatorProps {
 }
 
 export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
-  userName = "L'autre utilisateur",
+  userName = 'Other participant',
 }: TypingIndicatorProps) => {
   return (
     <View style={styles.container}>
@@ -18,7 +18,7 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
           <View style={[styles.dot, styles.dot3]} />
         </View>
       </View>
-      <Text style={styles.text}>{`${userName} est en train d'écrire...`}</Text>
+      <Text style={styles.text}>{`${userName} is typing...`}</Text>
     </View>
   );
 };

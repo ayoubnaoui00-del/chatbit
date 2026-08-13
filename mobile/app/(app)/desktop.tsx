@@ -24,10 +24,10 @@ export default function DesktopChatView() {
   const { user, logout } = useAuth();
   const [selectedConversationId, setSelectedConversationId] = useState<number | string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'en_attente' | 'en_cours' | 'fermee'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'in_progress' | 'closed'>('all');
 
   // Conversations Data
-  const { conversations, isLoading: isConversationsLoading, refetch } = useConversations();
+  const { conversations, isLoading: isConversationsLoading, refetch: refetchConversations } = useConversations();
 
   // Active Selected Conversation Data
   const selectedConversation = conversations.find(
@@ -38,12 +38,18 @@ export default function DesktopChatView() {
   const {
     messages,
     isLoading: isMessagesLoading,
-    refetch: refetchMessages,
+    appendMessage,
   } = useMessages(selectedConversationId ? String(selectedConversationId) : undefined);
 
   // Socket Integration
   const { startTyping, stopTyping, sendMessage: sendSocketMessage } = useChatSocket({
     activeConversationId: selectedConversationId ? String(selectedConversationId) : undefined,
+    onNewMessage: (newMsg) => {
+      appendMessage(newMsg);
+    },
+    onConversationUpdated: (updatedConv) => {
+      refetchConversations();
+    },
   });
 
   const typingUsersMap = useChatStore((state) => state.typingUsersMap);
@@ -63,13 +69,13 @@ export default function DesktopChatView() {
 
   // Filtered Conversations
   const filteredConversations = conversations.filter((c) => {
-    const clientName = c.client?.fullname || '';
+    const clientName = c.client?.fullname || c.client_name || '';
     const matchesSearch =
       (c.subject || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       clientName.toLowerCase().includes(searchQuery.toLowerCase());
-    if (activeTab === 'en_attente') return matchesSearch && c.status === 'en_attente';
-    if (activeTab === 'en_cours') return matchesSearch && c.status === 'en_cours';
-    if (activeTab === 'fermee') return matchesSearch && c.status === 'fermee';
+    if (activeTab !== 'all') {
+      return matchesSearch && c.status === activeTab;
+    }
     return matchesSearch;
   });
 
@@ -77,11 +83,9 @@ export default function DesktopChatView() {
     if (!selectedConversationId) return;
     sendSocketMessage(selectedConversationId, text);
     stopTyping(selectedConversationId);
-    refetchMessages();
-    refetch();
   };
 
-  const userName = user?.fullname || 'Utilisateur';
+  const userName = user?.fullname || 'User';
 
   return (
     <View style={styles.container}>
@@ -95,11 +99,11 @@ export default function DesktopChatView() {
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{userName}</Text>
             <Text style={styles.userRole}>
-              {user?.role === 'agent' ? '🛠️ Agent Support' : '👤 Client'}
+              {user?.role === 'agent' ? '🛠️ Support Agent' : '👤 Customer'}
             </Text>
           </View>
           <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-            <Text style={styles.logoutText}>Déconnexion</Text>
+            <Text style={styles.logoutText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
 
@@ -107,7 +111,7 @@ export default function DesktopChatView() {
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Rechercher une conversation..."
+            placeholder="Search conversations..."
             placeholderTextColor={COLORS.outline}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -116,14 +120,14 @@ export default function DesktopChatView() {
 
         {/* Filter Tabs */}
         <View style={styles.tabsContainer}>
-          {(['all', 'en_attente', 'en_cours', 'fermee'] as const).map((tab) => (
+          {(['all', 'pending', 'in_progress', 'closed'] as const).map((tab) => (
             <TouchableOpacity
               key={tab}
               style={[styles.tab, activeTab === tab && styles.tabActive]}
               onPress={() => setActiveTab(tab)}
             >
               <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                {tab === 'all' ? 'Toutes' : tab === 'en_attente' ? 'Attente' : tab === 'en_cours' ? 'Cours' : 'Fermées'}
+                {tab === 'all' ? 'All' : tab === 'pending' ? 'Pending' : tab === 'in_progress' ? 'In Progress' : 'Closed'}
               </Text>
             </TouchableOpacity>
           ))}
@@ -163,11 +167,11 @@ export default function DesktopChatView() {
                 <View style={styles.statusRow}>
                   <OnlineIndicator isOnline={isOtherUserOnline} size={10} />
                   <Text style={styles.statusText}>
-                    {isOtherUserOnline ? 'En ligne' : 'Hors ligne'}
+                    {isOtherUserOnline ? 'Online' : 'Offline'}
                   </Text>
                   <Text style={styles.bullet}>•</Text>
                   <Text style={styles.statusText}>
-                    Statut: <Text style={styles.boldText}>{selectedConversation.status}</Text>
+                    Status: <Text style={styles.boldText}>{selectedConversation.status}</Text>
                   </Text>
                 </View>
               </View>
@@ -195,7 +199,7 @@ export default function DesktopChatView() {
             {/* Typing Indicator */}
             {isOtherUserTyping && (
               <TypingIndicator
-                userName={selectedConversation.client?.fullname || 'Utilisateur'}
+                userName={selectedConversation.client?.fullname || selectedConversation.client_name || 'Customer'}
               />
             )}
 
@@ -204,15 +208,15 @@ export default function DesktopChatView() {
               onSendMessage={handleSendMessage}
               onTypingStart={() => selectedConversationId && startTyping(selectedConversationId)}
               onTypingStop={() => selectedConversationId && stopTyping(selectedConversationId)}
-              disabled={selectedConversation.status === 'fermee'}
+              disabled={selectedConversation.status === 'closed'}
             />
           </View>
         ) : (
           <View style={styles.placeholderContainer}>
             <Text style={styles.placeholderIcon}>💬</Text>
-            <Text style={styles.placeholderTitle}>Bienvenue sur ChatBit Support</Text>
+            <Text style={styles.placeholderTitle}>Welcome to ChatBit Support</Text>
             <Text style={styles.placeholderSub}>
-              Sélectionnez une conversation dans le panneau de gauche pour démarrer l'échange en temps réel.
+              Select a conversation from the left sidebar to start real-time messaging.
             </Text>
           </View>
         )}

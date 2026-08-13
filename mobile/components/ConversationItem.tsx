@@ -17,12 +17,12 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
 }: ConversationItemProps) => {
   const getStatusBadge = () => {
     switch (conversation.status) {
-      case 'en_attente':
-        return { label: 'En attente', bg: '#fef3c7', text: '#d97706' };
-      case 'en_cours':
-        return { label: 'En cours', bg: '#dbeafe', text: '#2563eb' };
-      case 'fermee':
-        return { label: 'Fermée', bg: '#f3f4f6', text: '#6b7280' };
+      case 'pending':
+        return { label: 'Pending', bg: '#fef3c7', text: '#d97706' };
+      case 'in_progress':
+        return { label: 'In Progress', bg: '#dbeafe', text: '#2563eb' };
+      case 'closed':
+        return { label: 'Closed', bg: '#f3f4f6', text: '#6b7280' };
       default:
         return { label: conversation.status, bg: '#f3f4f6', text: '#6b7280' };
     }
@@ -32,8 +32,8 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   const title = conversation.subject || 'Support Request';
 
   // Display user name or client info
-  const clientName = conversation.client?.fullname || `Client #${conversation.clientid}`;
-  const agentName = conversation.agent?.fullname || 'Agent non assigné';
+  const clientName = conversation.client?.fullname || conversation.client_name || `Customer #${conversation.clientid}`;
+  const agentName = conversation.agent?.fullname || conversation.agent_name || 'Unassigned';
 
   // Format date
   const formattedTime = conversation.createdat
@@ -60,7 +60,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
         </View>
 
         <Text style={styles.subtitle} numberOfLines={1}>
-          Client: {clientName} • Agent: {agentName}
+          Customer: {clientName} • Agent: {agentName}
         </Text>
 
         <View style={styles.footerRow}>

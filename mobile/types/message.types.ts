@@ -7,6 +7,8 @@ export interface Message {
   content: string;
   isread: boolean;
   sentat: string;
+  sender_name?: string;
+  sender_role?: string;
   sender?: User;
 }
 
@@ -18,10 +20,13 @@ export interface SendMessageDTO {
 export interface TypingPayload {
   conversationId: number | string;
   userId: number | string;
+  fullname?: string;
   isTyping: boolean;
 }
 
 export interface PresencePayload {
   userId: number | string;
+  fullname?: string;
+  role?: string;
   isOnline: boolean;
 }

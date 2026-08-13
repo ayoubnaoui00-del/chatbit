@@ -57,33 +57,33 @@ export default function ConversationDetailScreen() {
       appendMessage(newMsg);
     },
     onConversationUpdated: (updatedConv) => {
-      if (String(updatedConv.id) === conversationId) {
+      if (String(updatedConv?.id) === conversationId) {
         setCurrentConversation(updatedConv);
         refetchConversations();
       }
     },
   });
 
-  const isClosed = currentConversation?.status === 'fermee';
+  const isClosed = currentConversation?.status === 'closed';
   const isAgent = user?.role === 'agent';
 
   // Handle Close Ticket by Agent
   const handleCloseTicket = async () => {
     Alert.alert(
-      'Clôturer la conversation',
-      'Voulez-vous vraiment clôturer ce ticket ? Le client ne pourra plus envoyer de messages.',
+      'Close Conversation',
+      'Are you sure you want to close this ticket? The customer will no longer be able to send messages.',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Clôturer',
+          text: 'Close Ticket',
           style: 'destructive',
           onPress: async () => {
             try {
               const closed = await closeConversation(conversationId);
               setCurrentConversation(closed);
-              Alert.alert('Ticket clôturé', 'La conversation a été fermée avec succès.');
+              Alert.alert('Ticket Closed', 'The conversation has been successfully closed.');
             } catch (err: any) {
-              Alert.alert('Erreur', err.response?.data?.message || 'Impossible de fermer la conversation.');
+              Alert.alert('Error', err.response?.data?.message || 'Failed to close the conversation.');
             }
           },
         },
@@ -93,7 +93,7 @@ export default function ConversationDetailScreen() {
 
   // Configure navigation header
   useLayoutEffect(() => {
-    const titleText = currentConversation?.subject || 'Chat Support';
+    const titleText = currentConversation?.subject || 'Support Chat';
 
     navigation.setOptions({
       headerTitle: () => (
@@ -105,10 +105,10 @@ export default function ConversationDetailScreen() {
             <OnlineIndicator isOnline={isConnected} size={8} />
             <Text style={styles.headerSubtitleText}>
               {isClosed
-                ? 'Fermée'
+                ? 'Closed'
                 : isConnected
-                ? 'En ligne (Socket.IO)'
-                : 'Connexion...'}
+                ? 'Online (Socket.IO)'
+                : 'Connecting...'}
             </Text>
           </View>
         </View>
@@ -120,7 +120,7 @@ export default function ConversationDetailScreen() {
             onPress={handleCloseTicket}
             disabled={isClosing}
           >
-            <Text style={styles.closeHeaderBtnText}>Clôturer</Text>
+            <Text style={styles.closeHeaderBtnText}>Close</Text>
           </TouchableOpacity>
         ) : null,
     });
@@ -137,7 +137,7 @@ export default function ConversationDetailScreen() {
       {isClosed && (
         <View style={styles.closedBanner}>
           <Text style={styles.closedBannerText}>
-            {"🔒 Cette conversation a été clôturée par l'agent."}
+            {'🔒 This conversation has been closed by the support agent.'}
           </Text>
         </View>
       )}
@@ -170,7 +170,7 @@ export default function ConversationDetailScreen() {
 
       {/* Typing Indicator */}
       {isTyping && !isClosed && (
-        <TypingIndicator userName={isAgent ? 'Client' : 'Agent Support'} />
+        <TypingIndicator userName={isAgent ? 'Customer' : 'Support Agent'} />
       )}
 
       {/* Input Composer */}

@@ -1,6 +1,6 @@
 import { User } from './auth.types';
 
-export type ConversationStatus = 'en_attente' | 'en_cours' | 'fermee';
+export type ConversationStatus = 'pending' | 'in_progress' | 'closed';
 
 export interface Conversation {
   id: number | string;
@@ -10,6 +10,10 @@ export interface Conversation {
   agentid: number | string | null;
   createdat: string;
   closedat?: string | null;
+  client_name?: string;
+  client_email?: string;
+  agent_name?: string;
+  agent_email?: string;
   client?: User;
   agent?: User;
   unreadCount?: number;

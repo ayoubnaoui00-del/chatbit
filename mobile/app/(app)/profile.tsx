@@ -18,10 +18,10 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
 
   const handleLogout = async () => {
-    Alert.alert('Déconnexion', 'Êtes-vous sûr de vouloir vous déconnecter ?', [
-      { text: 'Annuler', style: 'cancel' },
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Déconnexion',
+        text: 'Sign Out',
         style: 'destructive',
         onPress: async () => {
           await logout();
@@ -45,37 +45,37 @@ export default function ProfileScreen() {
           <Text style={styles.userEmail}>{user?.email}</Text>
           <View style={styles.roleTag}>
             <Text style={styles.roleTagText}>
-              {user?.role === 'agent' ? 'Agent Support Souq Express' : 'Client Souq Express'}
+              {user?.role === 'agent' ? 'Souq Express Support Agent' : 'Souq Express Customer'}
             </Text>
           </View>
         </View>
 
         {/* Account Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Informations du Compte</Text>
+          <Text style={styles.sectionTitle}>Account Information</Text>
           
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>ID Utilisateur</Text>
+            <Text style={styles.detailLabel}>User ID</Text>
             <Text style={styles.detailValue}>#{user?.id}</Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Rôle</Text>
+            <Text style={styles.detailLabel}>Role</Text>
             <Text style={styles.detailValue}>
-              {user?.role === 'agent' ? 'Support Agent' : 'Client'}
+              {user?.role === 'agent' ? 'Support Agent' : 'Customer'}
             </Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Statut Réseau</Text>
-            <Text style={[styles.detailValue, { color: COLORS.online }]}>En Ligne</Text>
+            <Text style={styles.detailLabel}>Network Status</Text>
+            <Text style={[styles.detailValue, { color: COLORS.online }]}>Online</Text>
           </View>
         </View>
 
         {/* Actions */}
         <View style={styles.actionsSection}>
           <Button
-            title="Se Déconnecter"
+            title="Sign Out"
             variant="danger"
             onPress={handleLogout}
           />

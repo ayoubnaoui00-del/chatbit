@@ -16,6 +16,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     ? new Date(message.sentat).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : '';
 
+  const senderDisplayName = message.sender_name || message.sender?.fullname;
+
   return (
     <View style={[styles.wrapper, isCurrentUser ? styles.userWrapper : styles.otherWrapper]}>
       <View
@@ -24,8 +26,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           isCurrentUser ? styles.userBubble : styles.otherBubble,
         ]}
       >
-        {!isCurrentUser && message.sender && (
-          <Text style={styles.senderName}>{message.sender.fullname}</Text>
+        {!isCurrentUser && !!senderDisplayName && (
+          <Text style={styles.senderName}>{senderDisplayName}</Text>
         )}
         <Text style={[styles.content, isCurrentUser ? styles.userContent : styles.otherContent]}>
           {message.content}

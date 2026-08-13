@@ -30,7 +30,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setErrorMsg('Veuillez remplir tous les champs');
+      setErrorMsg('Please fill in all fields');
       return;
     }
 
@@ -41,9 +41,9 @@ export default function LoginScreen() {
       router.replace('/(app)/conversations');
     } catch (err: any) {
       console.error('Login error:', err);
-      const msg = err.response?.data?.message || 'Identifiants invalides';
+      const msg = err.response?.data?.message || 'Invalid email or password';
       setErrorMsg(msg);
-      Alert.alert('Erreur d\'authentification', msg);
+      Alert.alert('Authentication Error', msg);
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export default function LoginScreen() {
               <Image source={logoImg} style={styles.logoImage} resizeMode="contain" />
             </View>
             <Text style={styles.brandTitle}>ChatBit</Text>
-            <Text style={styles.brandSubtitle}>Support Client Souq Express</Text>
+            <Text style={styles.brandSubtitle}>Souq Express Customer Support</Text>
           </View>
 
           {/* Role Toggle Switcher */}
@@ -70,7 +70,7 @@ export default function LoginScreen() {
               activeOpacity={0.8}
             >
               <Text style={[styles.roleOptionText, role === 'client' && styles.roleOptionTextActive]}>
-                Client
+                Customer
               </Text>
             </TouchableOpacity>
 
@@ -80,7 +80,7 @@ export default function LoginScreen() {
               activeOpacity={0.8}
             >
               <Text style={[styles.roleOptionText, role === 'agent' && styles.roleOptionTextActive]}>
-                Agent Support
+                Support Agent
               </Text>
             </TouchableOpacity>
           </View>
@@ -94,8 +94,8 @@ export default function LoginScreen() {
             )}
 
             <Input
-              label="Adresse Email"
-              placeholder="votre@email.com"
+              label="Email Address"
+              placeholder="user@example.com"
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
@@ -103,7 +103,7 @@ export default function LoginScreen() {
             />
 
             <Input
-              label="Mot de Passe"
+              label="Password"
               placeholder="••••••••"
               isPassword
               value={password}
@@ -111,7 +111,7 @@ export default function LoginScreen() {
             />
 
             <Button
-              title={loading ? 'Connexion...' : 'Se Connecter'}
+              title={loading ? 'Signing In...' : 'Sign In'}
               onPress={handleLogin}
               loading={loading}
               style={styles.submitBtn}
@@ -122,8 +122,8 @@ export default function LoginScreen() {
               onPress={() => router.push('/(auth)/register')}
             >
               <Text style={styles.registerText}>
-                {"Pas encore de compte ? "}
-                <Text style={styles.registerTextHighlight}>{"S'inscrire"}</Text>
+                {"Don't have an account? "}
+                <Text style={styles.registerTextHighlight}>Sign Up</Text>
               </Text>
             </TouchableOpacity>
           </View>

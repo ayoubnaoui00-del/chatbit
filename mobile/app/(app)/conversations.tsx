@@ -60,7 +60,7 @@ export default function ConversationsScreen() {
 
   const handleCreateTicket = async () => {
     if (!subject.trim()) {
-      setCreateError('Veuillez entrer un sujet pour la conversation');
+      setCreateError('Please enter a subject for the conversation');
       return;
     }
 
@@ -69,9 +69,11 @@ export default function ConversationsScreen() {
       const newConv = await createConversation({ subject: subject.trim() });
       setSubject('');
       setModalVisible(false);
-      router.push(`/(app)/conversation/${newConv.id}`);
+      if (newConv?.id) {
+        router.push(`/(app)/conversation/${newConv.id}`);
+      }
     } catch (err: any) {
-      setCreateError(err.response?.data?.message || 'Erreur lors de la création');
+      setCreateError(err.response?.data?.message || 'Failed to create support ticket');
     }
   };
 
@@ -94,20 +96,20 @@ export default function ConversationsScreen() {
       <View style={styles.roleBanner}>
         <View style={styles.roleBadge}>
           <Text style={styles.roleBadgeText}>
-            {isAgent ? '🎧 Agent Support' : '🛍️ Client Souq Express'}
+            {isAgent ? '🎧 Support Agent' : '🛍️ Souq Express Customer'}
           </Text>
         </View>
-        <Text style={styles.welcomeText}>Bonjour, {user?.fullname}</Text>
+        <Text style={styles.welcomeText}>Hello, {user?.fullname}</Text>
       </View>
 
       {/* Agent Filter Tabs */}
       {isAgent && (
         <View style={styles.filterContainer}>
           {[
-            { key: 'all', label: 'Toutes' },
-            { key: 'en_attente', label: 'En attente' },
-            { key: 'en_cours', label: 'En cours' },
-            { key: 'fermee', label: 'Fermées' },
+            { key: 'all', label: 'All' },
+            { key: 'pending', label: 'Pending' },
+            { key: 'in_progress', label: 'In Progress' },
+            { key: 'closed', label: 'Closed' },
           ].map((filter) => (
             <TouchableOpacity
               key={filter.key}
@@ -137,15 +139,15 @@ export default function ConversationsScreen() {
         </View>
       ) : filteredConversations.length === 0 ? (
         <View style={styles.centerContainer}>
-          <Text style={styles.emptyTitle}>Aucune conversation</Text>
+          <Text style={styles.emptyTitle}>No conversations found</Text>
           <Text style={styles.emptySubtitle}>
             {isAgent
-              ? 'Aucun ticket ne correspond à ce filtre.'
-              : "Vous n'avez pas encore de demande de support active."}
+              ? 'No support tickets match this filter.'
+              : "You don't have any active support requests yet."}
           </Text>
           {!isAgent && (
             <Button
-              title="+ Nouvelle demande support"
+              title="+ New Support Request"
               onPress={() => setModalVisible(true)}
               style={styles.emptyCreateBtn}
             />
@@ -190,9 +192,9 @@ export default function ConversationsScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Nouvelle demande de support</Text>
+            <Text style={styles.modalTitle}>New Support Request</Text>
             <Text style={styles.modalSubtitle}>
-              Décrivez brièvement le sujet de votre problème (ex: Suivi de commande, Retour).
+              Briefly describe the subject of your issue (e.g. Order Tracking, Return request).
             </Text>
 
             {!!createError && (
@@ -202,21 +204,21 @@ export default function ConversationsScreen() {
             )}
 
             <Input
-              label="Sujet"
-              placeholder="Ex: Problème de livraison commande #4092"
+              label="Subject"
+              placeholder="e.g. Delivery issue with Order #4092"
               value={subject}
               onChangeText={setSubject}
             />
 
             <View style={styles.modalActions}>
               <Button
-                title="Annuler"
+                title="Cancel"
                 variant="outline"
                 onPress={() => setModalVisible(false)}
                 style={styles.modalBtn}
               />
               <Button
-                title={isCreating ? 'Création...' : 'Créer'}
+                title={isCreating ? 'Creating...' : 'Create'}
                 onPress={handleCreateTicket}
                 loading={isCreating}
                 style={styles.modalBtn}
@@ -228,10 +230,10 @@ export default function ConversationsScreen() {
 
       {/* Bottom Navigation Bar */}
       <BottomNavBar
-        activeTab={activeFilter === 'fermee' ? 'history' : 'chat'}
+        activeTab={activeFilter === 'closed' ? 'history' : 'chat'}
         onSelectTab={(tab) => {
           if (tab === 'chat') setActiveFilter('all');
-          if (tab === 'history') setActiveFilter('fermee');
+          if (tab === 'history') setActiveFilter('closed');
         }}
       />
     </SafeAreaView>

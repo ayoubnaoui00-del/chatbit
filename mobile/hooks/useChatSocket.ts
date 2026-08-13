@@ -1,10 +1,12 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { useQueryClient } from '@tanstack/react-query';
 import { SOCKET_URL } from '../utils/constants';
 import { useAuth } from './useAuth';
 import { useChatStore } from '../stores/chat.store';
 import { Message, TypingPayload, PresencePayload } from '../types/message.types';
 import { Conversation } from '../types/conversation.types';
+import { CONVERSATIONS_QUERY_KEY } from './useConversations';
 
 interface UseChatSocketProps {
   activeConversationId?: number | string;
@@ -19,6 +21,7 @@ export const useChatSocket = ({
 }: UseChatSocketProps = {}) => {
   const { token, user } = useAuth();
   const socketRef = useRef<Socket | null>(null);
+  const queryClient = useQueryClient();
 
   const {
     isConnected,
@@ -54,10 +57,10 @@ export const useChatSocket = ({
 
     const socket = io(SOCKET_URL, {
       auth: { token },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnection: true,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       reconnectionDelay: 1000,
     });
 
@@ -75,7 +78,7 @@ export const useChatSocket = ({
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Socket authentication error:', err.message);
+      console.error('Socket connection error:', err.message);
       setSocketError(err.message || 'Connection failed');
       setIsConnected(false);
     });
@@ -99,10 +102,12 @@ export const useChatSocket = ({
       setOnlineUser(String(payload.userId), payload.isOnline);
     });
 
-    // Listen for conversation changes
-    socket.on('conversation:updated', (conversation: Conversation) => {
-      if (onConversationUpdatedRef.current) {
-        onConversationUpdatedRef.current(conversation);
+    // Listen for conversation changes (e.g. assigned, closed, created)
+    socket.on('conversation:updated', (payload: any) => {
+      const conv: Conversation = payload?.conversation || payload;
+      queryClient.invalidateQueries({ queryKey: CONVERSATIONS_QUERY_KEY });
+      if (onConversationUpdatedRef.current && conv) {
+        onConversationUpdatedRef.current(conv);
       }
     });
 
@@ -115,7 +120,7 @@ export const useChatSocket = ({
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [token, user?.id, setIsConnected, setSocketError, setTypingUser, setOnlineUser]);
+  }, [token, user?.id, setIsConnected, setSocketError, setTypingUser, setOnlineUser, queryClient]);
 
   // Join room when activeConversationId changes
   useEffect(() => {
